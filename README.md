@@ -1,1 +1,1 @@
-# GEP
+# GEP - Gene Expression Pipeline
