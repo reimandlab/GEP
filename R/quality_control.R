@@ -10,7 +10,7 @@ library( arrayQualityMetrics)
 generateAQMreports <- function() {
     # Loops over 20 CEL files at a time, and spits out arrayQualityMetrics
     # reports for each subset of microarrays.
-    # *data too big to have all 200+ or even 50 microattays processed at a time
+    # *data too big to have all 200+ or even 50 microarrays processed at a time
     
     start <- 1  # start index to choose which CEL files to process
     end <- 20  # end index, same as above
@@ -18,10 +18,11 @@ generateAQMreports <- function() {
     files <- list.celfiles()
     len <- length( files )
     while ( end < len ) {
-        gse.data <- ReadAffy( filenames = files[start:end] )
+        gse.data <- ReadAffy( filenames = files[ start:end ] )
+        report.dir <- file.path( "..", "..", "output", paste( "aqm_report", 
+                                                             report.num ) )
         arrayQualityMetrics( expressionset = gse.data,
-                             outdir = file.path( "..","..", "output",
-                                                paste( "aqm_report", report.num ) ),
+                             outdir = report.dir,
                              force = TRUE,
                              do.logtransform = TRUE )
         start <- start + 20
