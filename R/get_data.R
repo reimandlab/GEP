@@ -5,18 +5,23 @@
 #==============================================================================
 
 library( GEOquery )
+library( affy )
+library( R.utils )
 
 get.data <- function( dataset ) {
-    # Retrieves specified dataset from public database
-    #
-    # Args:
-    #   dataset: character string naming desired dataset, specified by user
-
-    # Enforce datatype of 'dataset' parameter
+    
     stopifnot( class( dataset ) == "character" )
-    print(dataset)
-    # if GEO dataset:
     getGEOSuppFiles( dataset )
-    # if ArrayExpress dataset 
-    # ...
+    print( file.path(dataset) )
+    print( getwd() )
+    setwd( file.path( "GSE64415" ) )
+    tar.file <- list.files( pattern = ".tar" )
+    untar( tar.file )
+    cel.files <- sapply( list.celfiles(), gunzip )
+    affy.data <- ReadAffy( filenames = cel.files )
+    setwd( file.path( ".." ) )
+    unlink( dataset, recursive = TRUE )
+    return( affy.data )
 }
+
+
