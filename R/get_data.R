@@ -5,23 +5,24 @@
 #==============================================================================
 
 library( GEOquery )
-library( affy )
 library( R.utils )
 
 get.data <- function( dataset ) {
-    
+    # Retreives raw data CEL files for GEO datasets   
     stopifnot( class( dataset ) == "character" )
+    print( "Retreiving raw .CEL files from GEO." )
     getGEOSuppFiles( dataset )
-    print( file.path(dataset) )
-    print( getwd() )
-    setwd( file.path( "GSE64415" ) )
-    tar.file <- list.files( pattern = ".tar" )
-    untar( tar.file )
-    cel.files <- sapply( list.celfiles(), gunzip )
-    affy.data <- ReadAffy( filenames = cel.files )
-    setwd( file.path( ".." ) )
-    unlink( dataset, recursive = TRUE )
-    return( affy.data )
+    print( "done." )
 }
 
 
+unpack.data <- function() {
+    # Decompress raw data files and read as an AffyBatch objecti
+    print( "Unpacking tar file containing .CEL files." )
+    tar.file <- list.files( pattern = ".tar" )
+    untar( tar.file )
+    print( "Unpacking .CEL files." )
+    cels <- list.files( pattern = "[gz]" )
+    sapply( cels, gunzip )
+    print( "done." )
+}
