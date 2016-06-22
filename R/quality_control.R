@@ -1,14 +1,14 @@
 library( affy )
 library( arrayQualityMetrics )
 
-generateAQM <- function() {
-    out.file <- file.path( "/.mounts/labs/reimandlab/private/users/nsiddiqui/R", "AQM.RData" )
-    print( "Read in raw data as AffyBatch object." )
-    affy.data <- ReadAffy()
+generateAQM <- function( marray.data ) {
+    # Assess quality of dataset with functions from arrayQualityMetrics package
+    out.file <- file.path( 
+                "/.mounts/labs/reimandlab/private/users/nsiddiqui/R", 
+                "AQM.RData" )
     m <- list()
     print("Preparing data for summary statistics.")
-    x <- prepdata( affy.data, intgroup = c(), do.logtransform = TRUE )
-    pdf( tempfile() )
+    x <- prepdata( marray.data, intgroup = c(), do.logtransform = TRUE )
     print( "Generating array quality metrics." )
     print( "Heatmap" )
     m$heatmap <- aqm.heatmap( x )
@@ -23,20 +23,35 @@ generateAQM <- function() {
     print( "Probesmap" )
     m$probesmap <- aqm.probesmap( x )
     print( "Preparing data to perform Affymetrix-specific quality metrics." )
-    x <- prepaffy( affy.data, x )
+    x <- prepaffy( marray.data, x )
     print( "Generating Affymetrix-specific array quality metrics." )
     print( "RLE" )
     m$rle <- aqm.rle( x )
     print( "NUSE" )
     m$nuse <- aqm.nuse( x )
     print( "RNAdeg" )
-    m$rnadeg <- aqm.rnadeg( affy.data, x )
+    m$rnadeg <- aqm.rnadeg( marray.data, x )
     print( "PMMM" )
     m$pmmm <- aqm.pmmm( x )
     print( "MAplot" )
     m$maplot = aqm.maplot( x )
-    grDevices::dev.off()
     print( "Saving AQM object." ) 
     save( m, file = out.file )
     print( "done." )
+    return( m )
 }
+
+filter.marrays <- function( marray.data, aqm ) {
+    # Filter low-quality arrays out
+    
+    # identifying outliers provided from aqm functions
+    outliers <- c()
+    for( statistic in names( aqm ) ) {
+        outlier <- unlist( attributes ( aqm[[ statistic  ]]@outliers@which ), 
+                          use.names = FALSE )     
+        append(outliers, outlier)
+    }
+    
+    filtered.marray <- marray.data[, which( ! sampleNames(marray.data) %in% outliers ) ]
+}
+

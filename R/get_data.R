@@ -24,5 +24,8 @@ unpack.data <- function() {
     print( "Unpacking .CEL files." )
     cels <- list.files( pattern = "[gz]" )
     sapply( cels, gunzip )
+    print( "Reading in .CEL files as an AffyBatch object" )
+    affy.data <- ReadAffy()
     print( "done." )
+    return( affy.data )
 }
