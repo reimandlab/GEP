@@ -35,8 +35,6 @@ generateAQM <- function( marray.data ) {
     m$pmmm <- aqm.pmmm( x )
     print( "MAplot" )
     m$maplot = aqm.maplot( x )
-    print( "Saving AQM object." ) 
-    save( m, file = out.file )
     print( "done." )
     return( m )
 }
@@ -45,13 +43,24 @@ filter.marrays <- function( marray.data, aqm ) {
     # Filter low-quality arrays out
     
     # identifying outliers provided from aqm functions
+    print( "Identifying outliers." )
     outliers <- c()
     for( statistic in names( aqm ) ) {
         outlier <- unlist( attributes ( aqm[[ statistic  ]]@outliers@which ), 
                           use.names = FALSE )     
-        append(outliers, outlier)
+        outliers <- append(outliers, outlier)
     }
-    
-    filtered.marray <- marray.data[, which( ! sampleNames(marray.data) %in% outliers ) ]
-}
+    outliers <- unique( outliers )
+    print( outliers )
 
+    if ( ! length( outliers ) == 0 ) {
+        dir.create( "outliers" )
+        file.copy( outliers, "outliers" )
+        file.remove( outliers )
+    }
+   
+    # Filter dataset
+    #print( "Filtering low-quality arrays.")
+    #filtered.marrays <- marray.data[, which( ! sampleNames(marray.data) %in% outliers ) ]
+    #print( "done." ) 
+}
