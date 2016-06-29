@@ -1,14 +1,13 @@
 library( aroma.affymetrix )
 library( affy )
 
-preprocess <- function( dataset ) {
-    # Low level analysis of microarrays
+preprocess <- function( dataset, chipType ) {
 
-    verbose <- Argument$getVerbose( -8, timestamp = TRUE )
-    
+    # Low level analysis of microarrays
+    verbose <- Arguments$getVerbose( -8, timestamp = TRUE )
+
     # get annotation data files
     print( "Getting annotation data files." )
-    chipType <- cdfName( affy.obj )
     cdf <- AffymetrixCdfFile$byChipType( chipType )
     print( cdf )
     
@@ -22,7 +21,6 @@ preprocess <- function( dataset ) {
     bc <- RmaBackgroundCorrection( cs )
     csBC <- process( bc, verbose = verbose )
     qn <- QuantileNormalization( csBC, typesToUpdate="pm" )
-    carlyle_britto@hotmail.com
     print( qn )
     csN <- process( qn, verbose = verbose )
     print( csN )
@@ -30,13 +28,14 @@ preprocess <- function( dataset ) {
     # summarization
     print( "Summarization" )
     plm <- RmaPlm( csN )
-    princarlyle_britto@hotmail.com
-    t( plm )
+    print( plm )
     fit( plm, verbose = verbose )
 
     # quality assesment 
-    qam <- QualityAssessmentModel( plm )
+    #qam <- QualityAssessmentModel( plm )
     # Save 'qam' object and see if you can extract outliers
     
     ces <- getChipEffectSet( plm )
+    gExprs <- extractDataFrame( ces, units = NULL, addNames = TRUE )
+    return( gExprs )
 }

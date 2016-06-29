@@ -3,9 +3,6 @@ library( arrayQualityMetrics )
 
 generateAQM <- function( marray.data ) {
     # Assess quality of dataset with functions from arrayQualityMetrics package
-    out.file <- file.path( 
-                "/.mounts/labs/reimandlab/private/users/nsiddiqui/R", 
-                "AQM.RData" )
     m <- list()
     print("Preparing data for summary statistics.")
     x <- prepdata( marray.data, intgroup = c(), do.logtransform = TRUE )
@@ -39,7 +36,7 @@ generateAQM <- function( marray.data ) {
     return( m )
 }
 
-filter.marrays <- function( marray.data, aqm ) {
+filter.data <- function( aqm ) {
     # Filter low-quality arrays out
     
     # identifying outliers provided from aqm functions
@@ -52,15 +49,17 @@ filter.marrays <- function( marray.data, aqm ) {
     }
     outliers <- unique( outliers )
     print( outliers )
-
+    
+    # moving outlier samples 
+    print("Moving outlier samples to an 'outlier' directory." )
     if ( ! length( outliers ) == 0 ) {
         dir.create( "outliers" )
         file.copy( outliers, "outliers" )
         file.remove( outliers )
     }
-   
+ 
     # Filter dataset
     #print( "Filtering low-quality arrays.")
     #filtered.marrays <- marray.data[, which( ! sampleNames(marray.data) %in% outliers ) ]
-    #print( "done." ) 
+    print( "done." ) 
 }
