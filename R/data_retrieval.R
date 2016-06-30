@@ -8,33 +8,29 @@ library( GEOquery )
 library( affy )
 library( RCurl )
 
-find.pattern <- function( url, pattern ) {
+find.directories <- function( url ) {
     # get a vector of all instances of 'pattern' from 'url'
-    webpage <- getURL( url, dirlistonly = TRUE )
-    posns <- gregexpr( pattern, webpage)[[1]]
-    lengths <- attributes( posns )$match.length
-    pattern_instances <- substring( webpage, first = posns, 
-                                    last = posns + lengths - 1 )
-    return( pattern_instances )
+    dirlist <- getURL( url, verbose = TRUE, dirlistonly = TRUE )
+    dirlist <- strsplit( dirlist, "\n")[[1]]
+    return( dirlist )
 }
 
-get.all.series <- function( ) {
+get.all.gse <- function( ) {
     # Get list of all GEO series records
-    all.series <- c()
+    all.gse<- c()
 
     # first get list of all gse directory names on ftp website
     gse.url <- "ftp://ftp.ncbi.nlm.nih.gov/geo/series/"
-    gse.dirs <- find.pattern( gse.url, "GSE[0-9]*nnn")
+    gse.dirs <- find.directories( gse.url )
+    gse.dir.urls <- paste( gse.url, gse.dirs, "/", sep = "" )
 
     # then enter each gse directory and collect name of each series record
-
-    for( i in 1:length( gse.dirs ) ) {
-        gse.dir.url <- paste( gse.url, gse.dirs[i], "/", sep = "" )
-        series <- find.pattern( gse.dir.url, "GSE[0-9]+" )
-        all.series <- append( all.series, series )
+    for( i in 1:length( gse.dir.urls ) ) {
+        series <- find.directories( gse.dir.urls[i] )
+        all.gse <- append( all.gse, series )
     }
 
-    return( all.series )
+    return( all.gse )
 }
 
 get.raw.data <- function( dataset ) {

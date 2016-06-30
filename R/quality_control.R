@@ -53,8 +53,11 @@ filter.data <- function( aqm ) {
     # moving outlier samples 
     print("Moving outlier samples to an 'outlier' directory." )
     if ( ! length( outliers ) == 0 ) {
-        dir.create( "outliers" )
-        file.copy( outliers, "outliers" )
+        dir.name <- paste( dataset, "outliers", sep = "-" )
+        rel.path <- file.path( "..", "..", dir.name ) 
+        dir.create( rel.path )
+        abs.path <- normalizePath( rel.path )
+        file.copy( outliers, abs.path )
         file.remove( outliers )
     }
  
