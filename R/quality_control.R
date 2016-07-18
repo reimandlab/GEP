@@ -50,19 +50,9 @@ filter.data <- function( aqm ) {
     outliers <- unique( outliers )
     print( outliers )
     
-    # moving outlier samples 
-    print("Moving outlier samples to an 'outlier' directory." )
-    if ( ! length( outliers ) == 0 ) {
-        dir.name <- paste( dataset, "outliers", sep = "-" )
-        rel.path <- file.path( "..", "..", dir.name ) 
-        dir.create( rel.path )
-        abs.path <- normalizePath( rel.path )
-        file.copy( outliers, abs.path )
-        file.remove( outliers )
-    }
- 
     # Filter dataset
     #print( "Filtering low-quality arrays.")
     #filtered.marrays <- marray.data[, which( ! sampleNames(marray.data) %in% outliers ) ]
-    print( "done." ) 
+    print( "done." )
+    return( outliers )
 }

@@ -4,47 +4,50 @@
 
 #==============================================================================
 
-library( GEOquery )
-library( affy )
 library( RCurl )
+library( affy )
+library( GEOmetadb )
 
-find.directories <- function( url ) {
-    # get a vector of all instances of 'pattern' from 'url'
-    dirlist <- getURL( url, verbose = TRUE, dirlistonly = TRUE )
-    dirlist <- strsplit( dirlist, "\n")[[1]]
-    return( dirlist )
-}
-
-get.all.gse <- function( ) {
-    # Get list of all GEO series records
-    all.gse<- c()
-
-    # first get list of all gse directory names on ftp website
-    gse.url <- "ftp://ftp.ncbi.nlm.nih.gov/geo/series/"
-    gse.dirs <- find.directories( gse.url )
-    gse.dir.urls <- paste( gse.url, gse.dirs, "/", sep = "" )
-
-    # then enter each gse directory and collect name of each series record
-    for( i in 1:length( gse.dir.urls ) ) {
-        series <- find.directories( gse.dir.urls[i] )
-        all.gse <- append( all.gse, series )
+get.raw.data <- function( dataset, db.con ) {
+    # Retreives raw data CEL files for GEO datasets
+    stopifnot( class( dataset ) == 'character' )
+    print( paste( "Getting url for dataset", dataset ) )
+    query <- sprintf( "SELECT supplementary_file FROM gse WHERE gse='%s'", 
+                     dataset )
+    # downloading files from http url works better on cluster
+    supp_file <- sub( "ftp", "http", dbGetQuery( db.con, query ) )
+    supp_file <- strsplit( supp_file, ";")[[1]][1]
+    file.name <- tail( strsplit( supp_file, '/' )[[1]], n = 1 )
+    
+    # dataset doesn't exist or not found in GEOmetadb
+    if ( !url.exists( supp_file ) ) {
+        message( 'Supplemental file URL not found.' )
+        message( 'Check URL manually if in doubt' )
+        message( supp_file )
+        print( "No supplementary files found" )
+        return( 1 )
     }
 
-    return( all.gse )
-}
+    storedir <- file.path( getwd(), dataset )
+    
+    # check if dataset already exists locally
+    if ( file.exists( storedir ) &&
+         file.exists( file.path( storedir, file.name ) ) ) {
+         print( "Already exists!" )
+         return( 1 )
+    }
 
-get.raw.data <- function( dataset ) {
-    # Retreives raw data CEL files for GEO datasets   
-    stopifnot( class( dataset ) == "character" )
-    print( "Retreiving raw .CEL files from GEO." )
-    getGEOSuppFiles( dataset )
+    suppressWarnings( dir.create ( storedir ) )
+    print( "Retreiving .tar file, contining raw .CEL files, from GEO." )
+    download.file( supp_file, file.path( storedir, file.name ), 
+                  mode='wb', method='wget' )
     print( "done." )
 }
 
 unpack.data <- function( ) {
     # Decompress raw data files and read as an AffyBatch object
     print( "Unpacking tar file containing .CEL files." )
-    tar.file <- list.files( pattern = ".tar" )
+    tar.file <- list.files( pattern = ".tar$" )
     untar( tar.file )
     print( "Unpacking .CEL files." )
     sapply( list.celfiles(), gunzip )
