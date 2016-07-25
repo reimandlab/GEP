@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -q deb6build
+#$ -q deb8build
 #$ -cwd
 #$ -o /.mounts/labs/reimandlab/private/users/nsiddiqui/log/getbigdata.log
 #$ -e /.mounts/labs/reimandlab/private/users/nsiddiqui/log/getbigdata.err

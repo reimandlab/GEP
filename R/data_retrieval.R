@@ -56,6 +56,14 @@ unpack.data <- function( ) {
     # altering directory structure for aroma.affymetrix package
     print( "Altering directory structure." )
     cdf.name <- cdfName( affy.data )
+    
+    if( cdf.name %in% dir() ) {
+        print( "Dataset has already been processed." )
+        file.remove( list.celfiles() )
+        setwd( ".." )
+        return(NULL)
+    }
+
     print( "Creating directory named after chip type." )
     dir.create( cdf.name )
     print( "Moving .CEL files to chip directory." )

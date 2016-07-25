@@ -1,10 +1,16 @@
 library( aroma.affymetrix )
-library( affy )
 
-preprocess <- function( dataset, chipType ) {
+preprocess <- function( dataset, chipType, outDir ) {   
     
-    #file.name <- paste( dataset, "ppr_gexprs_df.rsav", sep = "_" )
-    #out.file <- file.path( "..", "output", file.name )
+    file.name <- paste( dataset, "gexprs_df.rsav", sep = "_" )
+    out.file <- file.path( outDir, file.name )
+
+    if ( file.exists( out.file ) ) {
+        file.name <- paste( dataset, "-clean_gexprs_df.rsav", sep = "" )
+        out.file <- file.path( "..", "output", file.name )
+    }
+   
+    unlink( c( "plmData", "probeData"), recursive = TRUE )
 
     # Low level analysis of microarrays
     verbose <- Arguments$getVerbose( -8, timestamp = TRUE )
@@ -40,6 +46,6 @@ preprocess <- function( dataset, chipType ) {
     
     ces <- getChipEffectSet( plm )
     gExprs <- extractDataFrame( ces, units = NULL, addNames = TRUE )
-    #save( gExprs, file = out.file )
+    save( gExprs, file = out.file )
     return( gExprs )
 }

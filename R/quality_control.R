@@ -7,18 +7,12 @@ generateAQM <- function( marray.data ) {
     print("Preparing data for summary statistics.")
     x <- prepdata( marray.data, intgroup = c(), do.logtransform = TRUE )
     print( "Generating array quality metrics." )
-    print( "Heatmap" )
-    m$heatmap <- aqm.heatmap( x )
-    print("PCA")
-    m$pca <- aqm.pca( x )
     print( "Boxplot" )
     m$boxplot <- aqm.boxplot( x )
-    print( "Density" )
-    m$density <- aqm.density( x )
-    print( "Meansd" )
-    m$meansd <- aqm.meansd( x )
-    print( "Probesmap" )
-    m$probesmap <- aqm.probesmap( x )
+    print( "Heatmap" )
+    m$heatmap <- aqm.heatmap( x )
+    print( "MAplot" )
+    m$maplot <- aqm.maplot( x )
     print( "Preparing data to perform Affymetrix-specific quality metrics." )
     x <- prepaffy( marray.data, x )
     print( "Generating Affymetrix-specific array quality metrics." )
@@ -26,12 +20,6 @@ generateAQM <- function( marray.data ) {
     m$rle <- aqm.rle( x )
     print( "NUSE" )
     m$nuse <- aqm.nuse( x )
-    print( "RNAdeg" )
-    m$rnadeg <- aqm.rnadeg( marray.data, x )
-    print( "PMMM" )
-    m$pmmm <- aqm.pmmm( x )
-    print( "MAplot" )
-    m$maplot = aqm.maplot( x )
     print( "done." )
     return( m )
 }
@@ -50,9 +38,25 @@ filter.data <- function( aqm ) {
     outliers <- unique( outliers )
     print( outliers )
     
+
     # Filter dataset
     #print( "Filtering low-quality arrays.")
     #filtered.marrays <- marray.data[, which( ! sampleNames(marray.data) %in% outliers ) ]
+    
     print( "done." )
     return( outliers )
+}
+
+separate.outliers <- function( dataset, outliers, cdf) {
+    print("Moving outlier samples to an 'outlier' directory." )
+        if ( ! length( outliers ) == 0 ) {
+            dir.name <- paste( dataset, "outliers", sep = "-" )
+            rel.path <- file.path( "..", "..", dir.name )
+            dir.create( rel.path )
+            rel.path <- file.path( rel.path, cdf )
+            dir.create( rel.path )
+            abs.path <- normalizePath( rel.path )
+            file.copy( outliers, abs.path )
+            file.remove( outliers )
+        }
 }
