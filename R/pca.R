@@ -4,6 +4,7 @@
 # 4. preprocess all datasets together, pca
 
 library( ggplot2 )
+library( ggrepel )
 
 pca <- function( data, title, outliers, outDir) {
     #perform pca
@@ -11,7 +12,8 @@ pca <- function( data, title, outliers, outDir) {
     rotation <- pca.df$rotation
     # create data frame for ggplot2, type column to identify outliers
     # 1 - regular sample, 0 - outlier sample
-    pca.df <- data.frame( type = 1, PC1 = rotation[,1], PC2 = rotation[,2] )
+    pca.df <- data.frame( name = rownames(rotation), type = 1, 
+                         PC1 = rotation[,1], PC2 = rotation[,2] )
     pca.df[ which( rownames( pca.df ) %in% outliers ), ]$type <- 0
 
     # create plot

@@ -1,4 +1,4 @@
-library( tools )
+lvim appibrary( tools )
 source( "R/data_retrieval.R" )
 source( "R/quality_control.R" )
 source( "R/preprocess.R" )
@@ -6,8 +6,15 @@ source( "R/pca.R" )
 
 setwd( file.path( "data", "rawData" ) )
 
-datasets <- c("GSE64415", "GSE50006", "GSE48350") 
-    
+args = commandArgs( trailingOnly= TRUE )
+
+if ( length( args ) == 0 ) {
+    stop( "Please specify atleast one dataset - i.e., GSEXXXX.",
+         call. = FALSE )
+} else {
+    datasets <- args
+}
+
 for( i in 1:length( datasets ) ) {
     out.dir <- file.path( "..", "..", "output", datasets[i] )
     dir.create( out.dir )
@@ -29,7 +36,7 @@ for( i in 1:length( datasets ) ) {
                         USE.NAMES = FALSE )
     setwd( "../../.." )
     file.of.ol <- paste( datasets[i], "outliers", sep = "-" )
-    write( outliers, file.path( "..", "output", file.of.ol ) )
+    write( outliers, file.path( out.dir, file.of.ol ) )
     # samples + outliers preprocessed together, pca
     prp.data.together <- preprocess( datasets[i], cdf, out.dir)
     pca.together( prp.data.together, datasets[i], outliers, out.dir )

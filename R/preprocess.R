@@ -7,10 +7,9 @@ preprocess <- function( dataset, chipType, outDir ) {
 
     if ( file.exists( out.file ) ) {
         file.name <- paste( dataset, "-clean_gexprs_df.rsav", sep = "" )
-        out.file <- file.path( "..", "output", file.name )
+        out.file <- file.path( outDir, file.name )
     }
    
-    unlink( c( "plmData", "probeData"), recursive = TRUE )
 
     # Low level analysis of microarrays
     verbose <- Arguments$getVerbose( -8, timestamp = TRUE )
