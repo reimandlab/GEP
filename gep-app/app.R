@@ -2,7 +2,7 @@ library(shiny)
 library(shinythemes)
 source("geodb_utils.R")
 
-getSQLiteFile()
+#getSQLiteFile()
 con <- dbConnect(SQLite(), "GEOmetadb.sqlite")
 
 server <- function(input, output, session){
@@ -13,7 +13,23 @@ server <- function(input, output, session){
       selectInput('gse', 'Select GEO Series', gse.list(),
                   multiple = TRUE, selectize = TRUE)
     })
-    
+
+    output$gpl_summary <- renderUI({
+        Text <- lapply(input$gpl,
+                       function(nm) {
+                        p(strong(nm), count.gse.one.gpl(con, nm), ' series.')
+                       })
+        do.call(p, Text)
+    })
+
+    output$gse_summary <- renderUI({
+        Text <- lapply(input$gse,
+                       function(nm) {
+                        p(strong(nm), count.gsm.for.gse(con, nm), ' samples.')
+                       })
+        do.call(p, Text)
+    })
+
     output$tabs <- renderUI({
 
         Tabs <- lapply(input$gse, 
@@ -80,7 +96,9 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                         multiple = TRUE, selectize = TRUE),
             textInput('keyword','Search for datasets by Keyword'),
             hr(),
-            htmlOutput('selectgseUI')
+            htmlOutput('selectgseUI'),
+            htmlOutput('gpl_summary'),
+            htmlOutput('gse_summary')
         ),
 
         mainPanel(

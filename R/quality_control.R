@@ -47,7 +47,7 @@ filter.data <- function( aqm ) {
     return( outliers )
 }
 
-separate.outliers <- function( dataset, outliers, cdf) {
+separate.outliers <- function( dataset, outliers, clean, cdf) {
     print("Moving outlier samples to an 'outlier' directory." )
         if ( ! length( outliers ) == 0 ) {
             dir.name <- paste( dataset, "outliers", sep = "-" )
@@ -57,6 +57,14 @@ separate.outliers <- function( dataset, outliers, cdf) {
             dir.create( rel.path )
             abs.path <- normalizePath( rel.path )
             file.copy( outliers, abs.path )
-            file.remove( outliers )
+        }
+        if ( ! length( clean ) == 0 ) {
+            dir.name <- paste( dataset, "clean", sep = "-" )
+            rel.path <- file.path("..", "..", dir.name )
+            dir.create( rel.path )
+            rel.path <- file.path( rel.path, cdf )
+            dir.create( rel.path )
+            abs.path <- normalizePath( rel.path )
+            file.copy( clean, abs.path )
         }
 }

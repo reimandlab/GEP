@@ -5,16 +5,39 @@
 
 library( ggplot2 )
 library( ggrepel )
+#library(factoextra)
 
 pca <- function( data, title, outliers, outDir) {
     #perform pca
     pca.df <- prcomp( data )
     rotation <- pca.df$rotation
+    # generate variance explained plot
+    # Eigenvalues
+    eig <- (pca.df$sdev)^2
+    #variances in percentage
+    variance <- eig*100/sum(eig)
+    # Cumulative variances
+    cumvar <- cumsum(variance)
+    eig.data <- data.frame( eig = eig, variance = variance,
+                            cumvariance = cumvar )
+    out.file <- file.path( outDir,
+                       paste( "variance", "explained", title, sep="-" ))
+    print("Plotting variance graph.")
+    png( paste( out.file, 'png', sep='.' ) )
+    barplot( eig.data[, 2][1:10], names.arg=1:10,
+             main  = "Variance",
+             xlab = "Principal Components",
+             ylab = "Percentage of variances",
+             ylim = c(-10, 100),
+             col = "steelblue" )
+    lines( x=1:10, eig.data[, 2][1:10], type="b", pch=19, col="red" )
+    dev.off()
     # create data frame for ggplot2, type column to identify outliers
     # 1 - regular sample, 0 - outlier sample
     pca.df <- data.frame( name = rownames(rotation), type = 1, 
                          PC1 = rotation[,1], PC2 = rotation[,2] )
-    pca.df[ which( rownames( pca.df ) %in% outliers ), ]$type <- 0
+    if(nrow(pca.df[which(rownames(pca.df) %in% outliers),]) != 0)
+        pca.df[ which( rownames( pca.df ) %in% outliers ), ]$type <- 0
 
     # create plot
     print( "Plotting PCA graph." )

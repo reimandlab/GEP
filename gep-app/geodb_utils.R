@@ -23,10 +23,26 @@ list.gse.by.gpl <- function(con, gpl) {
                  "SELECT gse.gse FROM gse JOIN (SELECT * FROM gse_gpl 
                                                 GROUP BY gse 
                                                 HAVING COUNT(gpl)=1) gpl
-                ON gse.gse=gpl.gse WHERE gpl='%s'", gpl[i])
+                  ON gse.gse=gpl.gse WHERE gpl='%s'", gpl[i])
         gse.list <- c(gse.list, dbGetQuery(con, query)[,1])
     }
     return(gse.list)
+}
+
+count.gse.one.gpl <- function(con, gpl) {
+    query <- sprintf(
+             "SELECT COUNT(gse.gse) FROM gse JOIN (SELECT * FROM gse_gpl
+                                                   GROUP BY gse
+                                                   HAVING COUNT(gpl)=1) gpl
+              ON gse.gse=gpl.gse WHERE gpl='%s'", gpl)
+    cnt <- dbGetQuery(con, query)[,1]
+    return(cnt)
+}
+
+count.gsm.for.gse <- function(con, gse) {
+    query <- sprintf("SELECT COUNT(gsm) FROM gsm WHERE series_id='%s'", gse)
+    cnt <- dbGetQuery(con, query)[,1]
+    return(cnt)
 }
 
 gse.status <- function(con, gse) {

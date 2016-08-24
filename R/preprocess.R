@@ -5,12 +5,6 @@ preprocess <- function( dataset, chipType, outDir ) {
     file.name <- paste( dataset, "gexprs_df.rsav", sep = "_" )
     out.file <- file.path( outDir, file.name )
 
-    if ( file.exists( out.file ) ) {
-        file.name <- paste( dataset, "-clean_gexprs_df.rsav", sep = "" )
-        out.file <- file.path( outDir, file.name )
-    }
-   
-
     # Low level analysis of microarrays
     verbose <- Arguments$getVerbose( -8, timestamp = TRUE )
 
