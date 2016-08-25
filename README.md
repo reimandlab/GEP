@@ -10,3 +10,30 @@ So far only the [GEO](http://www.ncbi.nlm.nih.gov/geo/ "Gene Expression Omnibus"
 
 ### Overview of Pipeline
 Data retrieval is done using the packages from [Bioconductor](https://www.bioconductor.org/). Particularly, gene expression raw data was accessed using code from [GEOquery](https://bioconductor.org/packages/release/bioc/html/GEOquery.html) and metadata for datasets was retrieved using [GEOmetadb](https://www.bioconductor.org/packages/release/bioc/html/GEOmetadb.html).
+
+Quality control was performed by the [arrayQualityMetrics](https://bioconductor.org/packages/release/bioc/html/arrayQualityMetrics.html) package from [Bioconductor](https://www.bioconductor.org/).
+
+Normalisation, correction, and preprocessing was performed using code from the [aroma.affymetrix](https://cran.r-project.org/web/packages/aroma.affymetrix/index.html) package - particularly the [Gene 1.0 ST Array Analysis](http://www.aroma-project.org/vignettes/GeneSTArrayAnalysis/) protocol.
+
+Other packages used include [RCurl](https://cran.r-project.org/web/packages/RCurl/index.html) for downloading data, [affy](http://bioconductor.org/packages/release/bioc/html/affy.html) for reading data, and [ggplot2](http://ggplot2.org/) and [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html) for generating different plots of the data.
+
+
+### Use
+
+So far this collection of R code has been designed to be used in an OICR's SGE HPC Cluster environment. 
+
+**_You must be in the GEP directory (the top level project directory) when submitting jobs._**
+
+For data retrieval the main_naccess.R script was written, which is submitted the cluster with the main_naccess.sh script. As the name implies, this script requires network access, so the bash script has been written so the data retrieval job is submitted to a build node which has network access. To submit a job to retrieve raw gene expression data, type the following in the cluster environment
+
+`qsub R/main_naccess.sh`
+
+To run the pipeline and have it generate the outputs it is supposed to, the main.R script was written. As before, to submit this to the cluster you use the main.sh bash script. To run the pipeline, simply type the following in the cluster environment
+
+`qsub R/main.sh [list of datasets]` 
+
+The list of datasets are the ones that were retrieved using the script mentioned above. Specifically, datasets we're looking at are GEO  Series denoted by titles such as GSExxx - [here](http://www.ncbi.nlm.nih.gov/geo/browse/?view=series "GEO Series") is a where they are all listed.
+
+### Outputs
+
+Outputs from running the pipelines are all dumped into the outputs directory - within it, for each dataset put through the pipeline, there is a directory which will contain all of that dataset's respective outputs. 
