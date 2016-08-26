@@ -24,15 +24,21 @@ So far this collection of R code has been designed to be used in an OICR's SGE H
 
 **_You must be in the GEP directory (the top level project directory) when submitting jobs._**
 
-For data retrieval the main_naccess.R script was written, which is submitted the cluster with the main_naccess.sh script. As the name implies, this script requires network access, so the bash script has been written so the data retrieval job is submitted to a build node which has network access. To submit a job to retrieve raw gene expression data, type the following in the cluster environment
+For data retrieval the get_raw_data.R script was written, which is submitted the cluster with the get_raw_data.sh script. This script requires network access, so the bash script has been written so the data retrieval job is submitted to a build node which has network access. To submit a job to retrieve raw gene expression data, type the following in the cluster environment
 
-`qsub R/main_naccess.sh`
+`qsub R/get_raw_data.sh`
 
 To run the pipeline and have it generate the outputs it is supposed to, the main.R script was written. As before, to submit this to the cluster you use the main.sh bash script. To run the pipeline, simply type the following in the cluster environment
 
-`qsub R/main.sh [list of datasets]` 
+`qsub R/run_pipeline.sh [list of datasets]` 
 
 The list of datasets are the ones that were retrieved using the script mentioned above. Specifically, datasets we're looking at are GEO  Series denoted by titles such as GSExxx - [here](http://www.ncbi.nlm.nih.gov/geo/browse/?view=series "GEO Series") is a where they are all listed.
+
+In order to combine the samples from different datasets, and run the the pipeline on these samples together, the combine_and_run_pipeline.R script was written and it's corresponsing job sumission script combine_and_run_pipeline.sh. To use, type
+
+`qsub R/combine_and_run_pipeline.sh [title] [list of datasets]`
+
+Where the title specifies the directory name to save data/outputs under and the list of datasets refers to the list of GEO Series (GSExxx) datasets you wish to combine.
 
 ### Outputs
 
