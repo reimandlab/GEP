@@ -36,4 +36,7 @@ The list of datasets are the ones that were retrieved using the script mentioned
 
 ### Outputs
 
-Outputs from running the pipelines are all dumped into the outputs directory - within it, for each dataset put through the pipeline, there is a directory which will contain all of that dataset's respective outputs. 
+Outputs from running the pipeline are all dumped into the outputs directory - within it, for each dataset put through the pipeline, there is a directory named after the dataset which will contain all of that dataset's respective outputs. This includes the gene expression data when all of the samples in the dataset are preprocessed together, the gene expression data of just the clean samples preprocessed together, and gene expression data just for the outlier samples preprocessed together. Besides this gene expression data, a number of plots are genberate using both strategies where clean and outlier samples are preprecessed together and separately. The plots include Principal Component Anaysis (PCA), variance explained by each component, boxplot of values, heatmaps, and correlation matrices.
+
+### Shiny App
+
