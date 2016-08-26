@@ -1,8 +1,8 @@
 #!/bin/bash
 #$ -q deb8build
 #$ -cwd
-#$ -o /.mounts/labs/reimandlab/private/users/nsiddiqui/log/getbigdata.log
-#$ -e /.mounts/labs/reimandlab/private/users/nsiddiqui/log/getbigdata.err
+#$ -o /.mounts/labs/reimandlab/private/users/nsiddiqui/log/get_data.log
+#$ -e /.mounts/labs/reimandlab/private/users/nsiddiqui/log/get_data.err
 
 source /oicr/cluster/etc/profile
 module load R/3.3.0

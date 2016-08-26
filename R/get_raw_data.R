@@ -1,13 +1,15 @@
-source( "R/data_retrieval.R" )
+# This script will attempt retrieving all datasets with GPL570 only
+# edit SQLite query to specify other datasets
 
+source( "R/data_retrieval.R" )
 
 setwd( "data" )
 con <- dbConnect( SQLite(), 'GEOmetadb.sqlite' )
-gpl570_query <- "SELECT gse.gse FROM gse JOIN (SELECT * FROM gse_gpl
+gpl570_query <- sprintf("SELECT gse.gse FROM gse JOIN (SELECT * FROM gse_gpl
                                                GROUP BY gse
                                                HAVING COUNT(gpl) = 1 ) gpl
                  ON gse.gse=gpl.gse
-                 WHERE gpl='GPL570' ORDER BY RANDOM() LIMIT 1000"
+                 WHERE gpl='GPL570' ORDER BY RANDOM()")
 
 query_ret <- dbGetQuery( con, gpl570_query )
                              

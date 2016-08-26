@@ -1,3 +1,5 @@
+# main pipeline
+
 library( tools )
 source( "R/data_retrieval.R" )
 source( "R/quality_control.R" )
@@ -7,7 +9,7 @@ source( "R/plots.R" )
 
 setwd( file.path( "data", "rawData" ) )
 
-args = commandArgs( trailingOnly= TRUE )
+args <- commandArgs( trailingOnly= TRUE )
 
 if ( length( args ) == 0 ) {
     stop( "Please specify atleast one dataset - i.e., GSEXXXX.",
@@ -16,7 +18,7 @@ if ( length( args ) == 0 ) {
     datasets <- args
 }
 
-run <- function(datasets) {
+run.pipeline <- function(datasets) {
     for( i in 1:length( datasets ) ) {
         if ( grepl("clean", datasets[i]) || grepl("outliers", datasets[i] ))
             next
@@ -53,12 +55,22 @@ run <- function(datasets) {
         separate.outliers( datasets[i], outlier.files, clean.files, cdf )
         print( "Filtered samples: " )
         setwd("../..")
-        print( list.celfiles( file.path(paste(datasets[i], "clean", sep="-" ),
-                                        cdf ) ) )
-        if ( length(outliers) == 0 ) next
+        filtered <- list.celfiles( file.path(paste(datasets[i], "clean", sep="-" ),
+                                        cdf ) )
+        print( filtered )
+        if ( length( filtered ) <= 1) {
+            print( "Only one clean array - no need for separate preprocessing" )
+            setwd( ".." )
+            next
+        } 
+        if ( length( outliers ) <= 1 ) {
+            print( "Only one outlier array - no need for seperate preprocessing")
+            setwd( ".." )
+            next
+        }
         setwd( ".." )
         # samples + outliers preprocessed seperately, pca
-        prp.data.clean <- preprocess( paste ( datasets[i], "clean", sep = "-"), 
+        prp.data.clean <- preprocess( paste ( datasets[i], "clean", sep = "-" ), 
                                      cdf, out.dir) 
         prp.data.ol <- preprocess( paste ( datasets[i], "outliers", sep = "-" ), 
                                   cdf, out.dir )
@@ -70,4 +82,4 @@ run <- function(datasets) {
     }
 }
 
-run(datasets)
+run.pipeline(datasets)
