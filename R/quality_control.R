@@ -1,41 +1,48 @@
-# R script for performing quality analysis and quality control on sets of 
-# Microarrays. Uses arrayQualityMetrics as a tool for analyzing quality of
-# arrays, then filters out low-quality arrays
-
-#==============================================================================
-
 library( affy )
-library( arrayQualityMetrics)
+library( arrayQualityMetrics )
 
-generateAQMreports <- function() {
-    # Loops over 20 CEL files at a time, and spits out arrayQualityMetrics
-    # reports for each subset of microarrays.
-    # *data too big to have all 200+ or even 50 microarrays processed at a time
+generateAQM <- function( marray.data ) {
+    # Assess quality of dataset with functions from arrayQualityMetrics package
+    m <- list()
+    print("Preparing data for summary statistics.")
+    x <- prepdata( marray.data, intgroup = c(), do.logtransform = TRUE )
+    print( "Generating array quality metrics." )
+    print( "Boxplot" )
+    m$boxplot <- aqm.boxplot( x )
+    print( "Heatmap" )
+    m$heatmap <- aqm.heatmap( x )
+    print( "MAplot" )
+    m$maplot <- aqm.maplot( x )
+    print( "Preparing data to perform Affymetrix-specific quality metrics." )
+    x <- prepaffy( marray.data, x )
+    print( "Generating Affymetrix-specific array quality metrics." )
+    print( "RLE" )
+    m$rle <- aqm.rle( x )
+    print( "NUSE" )
+    m$nuse <- aqm.nuse( x )
+    print( "done." )
+    return( m )
+}
+
+filter.data <- function( aqm ) {
+    # Filter low-quality arrays out
     
-    start <- 1  # start index to choose which CEL files to process
-    end <- 20  # end index, same as above
-    report.num <- 1 # which [number] report is being written?
-    files <- list.celfiles()
-    len <- length( files )
-    while ( end < len ) {
-        gse.data <- ReadAffy( filenames = files[ start:end ] )
-        report.dir <- file.path( "..", "..", "output", paste( "aqm_report", 
-                                                             report.num ) )
-        arrayQualityMetrics( expressionset = gse.data,
-                             outdir = report.dir,
-                             force = TRUE,
-                             do.logtransform = TRUE )
-        start <- start + 20
-        end <- end + 20
-        report.num <- report.num + 1
+    # identifying outliers provided from aqm functions
+    print( "Identifying outliers." )
+    outliers <- c()
+    for( statistic in names( aqm ) ) {
+        outlier <- unlist( attributes ( aqm[[ statistic  ]]@outliers@which ), 
+                          use.names = FALSE )     
+        outliers <- append(outliers, outlier)
     }
+    outliers <- unique( outliers )
+    print( outliers )
+    
 
-    # spit out QA reports for any left over microarrays (< 20)
-    remaining.arrays <- len - start + 1
-    gse.data <- ReadAffy( filenames = tail( files, remaining.arrays ) )
-    arrayQualityMetrics( expressionset = gse.data,
-                         outdir = file.path( "..", "..", "output",
-                                            paste( "aqm_report", report.num ) ),
-                         force = TRUE,
-                         do.logtransform = TRUE )
+    # Filter dataset
+    #print( "Filtering low-quality arrays.")
+    #filtered.marrays <- marray.data[, which( ! sampleNames(marray.data) %in% outliers ) ]
+    
+    print( "done." )
+    return( outliers )
 }
