@@ -3,7 +3,6 @@
 
 source( "R/data_retrieval.R" )
 
-
 args <- commandArgs( trailingOnly = TRUE )
 
 if ( length( args ) == 0 ) {
@@ -16,10 +15,10 @@ if ( length( args ) == 0 ) {
 setwd( "data" )
 con <- dbConnect( SQLite(), 'GEOmetadb.sqlite' )
 
-
 setwd( "rawData" )
 
 for( i in 1:length( datasets ) ) {
         get.raw.data( datasets[i], con )
 }
+
 dbDisconnect(con)

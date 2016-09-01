@@ -120,6 +120,7 @@ correlation.plot <- function(corr.data) {
               axis.text.y=element_blank(), axis.ticks.y=element_blank()) +
         scale_fill_gradient2(limits=c(-1,1))
 }
+
 correlation.together <- function(gexprs, title, out.dir) {   
     fname <- paste('correlation', title, 'together', sep='-')
     gexprs.mat <- as.matrix(gexprs[-c(1, 1:5)])

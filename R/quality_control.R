@@ -37,7 +37,6 @@ filter.data <- function( aqm ) {
     }
     outliers <- unique( outliers )
     print( outliers )
-    
 
     # Filter dataset
     #print( "Filtering low-quality arrays.")
