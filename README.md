@@ -17,7 +17,7 @@ Normalisation, correction, and preprocessing was performed using code from the [
 
 Other packages used include [RCurl](https://cran.r-project.org/web/packages/RCurl/index.html) for downloading data, [affy](http://bioconductor.org/packages/release/bioc/html/affy.html) for reading data, and [ggplot2](http://ggplot2.org/) and [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html) for generating different plots of the data.
 
-**Here is a consolidated list of required R package dependencies to use the tool**
+**Here is a consolidated list of R package dependencies you are required to install to use the tool**
 
 * [aroma.affymetrix](https://cran.r-project.org/web/packages/aroma.affymetrix/index.html)
 * [ggplot2](http://ggplot2.org/)
@@ -29,45 +29,36 @@ _[Bioconductor](https://www.bioconductor.org/) Packages (follow links for instal
 * [arrayQualityMetrics](https://bioconductor.org/packages/release/bioc/html/arrayQualityMetrics.html)
 * [affy](http://bioconductor.org/packages/release/bioc/html/affy.html)
 
-**_Make sure you have all of the above packages installed in your cluster enviroment before beginning use._**
+**_Please make sure you have all of the above packages installed in your cluster enviroment before beginning use._**
 
 ## Use
 
-So far this collection of R code has been designed to be used in an OICR's SGE High Performance Computing (HPC) Cluster environment. 
+So far this collection of R scripts, executed by bash scripts, that  have been designed to be used in an OICR's SGE High Performance Computing (HPC) Cluster environment. 
 
-**_You must be in the GEP directory (the top level project directory) when submitting jobs._**
-
-**_You must update the directory locations in the Shell scripts provided (start_gep.sh, run_pipeline.sh, combine_and_run_pipeline.sh, get_data_sql.sh, get_raw_data.sh) to use any of the provided utilities._**
+**_You must update the directory locations in the Shell scripts provided - start_gep.sh and get_data.sh in the top-level GEP directory, and run_pipeline.sh, combine_and_run_pipeline.sh, get_raw_data.sh, get_data_sql.sh in the R directory - to use any of the provided utilities._**
 
 ### Data Retrieval
+The **get_data.sh** script is the interface designed to let you download a list of GSEXXX datasets you wish to download. There are two methods used to specify the list of datasets you wish to download, and these method are toggled by options fed to the script. The options are
+  * **-l** : if you specify this option, it is followed by a list of GSEXXX datasets seprated by spaces. Here is an example wit some random GSE datasets
+  
+  `./get_data.sh -l GSE19317 GSE64415 GSE50006 ...`
+  * **-sql**: this option should be followed by an SQL query, as a single string, against the GEOmetadb database. If no SQL query follows the option, the default query is used
+  
+  `SELECT gse.gse FROM gse JOIN (SELECT * FROM gse_gpl GROUP BY gse HAVING COUNT(gpl) = 1) gpl ON gse.gse=gpl.gse WHERE gpl='GPL570' ORDER BY RANDOM()`
 
-There are two method for data retrieval - one, by specifying an SQL query that generates a list of GSE datasets from GEOmetadb, and two, by simply specifying a list of GSE datasets. As the name implies, the script get_data_sql.R is written for the former data retrieval method, which is submitted to the cluster using the get_data_sql.sh. To specify gene expression datasets to retrieve via an SQL query, type the following in the cluster environment
+  Otherwise you specify your query like this
+    
+   `./get_data -sql "SELECT gse FROM gse WHERE ... "`
+    
+#### Expected Outputs
+1. **get_data.log** and **get_data.err** files located wherever you specify the location of the log files in the **get_data.sh** script.
+  * **get_data.log** tells the user whether a dataset was downloaded or not, depending whether it could find the dataset's raw data **.tar** file online
+  * **get_data.err** shows the progress of each dataset being downloaded, and also if the program unexpectedly stops it will tell you where it stopped and an error message.
 
-`qsub R/get_data_sql.sh "SELECT gse FROM gse WHERE ..."`
-
-Similarly, for the latter method, the get_raw_data.R script was written, which is submitted to the cluster using the get_raw_data.sh script. To submit a job to retrieve raw gene expression data by listing datasets, type the following in the cluster environment
-
-`qsub R/get_raw_data.sh [list of datasets]`
-
-Both of these scripts  require network access, so the bash scripts have been written so that data retrieval jobs are submitted to a build node which has network access. The main difference between the scripts for data retrieval and the pipeline is that the data retrieval activities don't require as much memory, thus they can be execute on your local machine as long as it has network access. To run either of the scripts, type
-
-`Rscript ./R/get_data_sql.R "SELECT gse FROM gse WHERE ..."`
-
-`Rscript ./R/get_raw_data.R [list of datasets]`
+2. Within the **data/rawData** directory there should be directories named after the GSEXXX datasets you specified to download , within each directory is that dataset's raw data **.tar** file
 
 ### Running Pipeline
 
-To run the pipeline and have it generate the outputs it is supposed to, the main.R script was written. As before, to submit this to the cluster you use the main.sh bash script. To run the pipeline, simply type the following in the cluster environment
-
-`qsub R/run_pipeline.sh [list of datasets]` 
-
-The list of datasets are the ones that were retrieved using the script mentioned above. Specifically, datasets we're looking at are GEO  Series denoted by titles such as GSExxx - [here](http://www.ncbi.nlm.nih.gov/geo/browse/?view=series "GEO Series") is a where they are all listed.
-
-In order to combine the samples from different datasets, and run the the pipeline on these samples together, the combine_and_run_pipeline.R script was written and it's corresponsing job sumission script combine_and_run_pipeline.sh. To use, type
-
-`qsub R/combine_and_run_pipeline.sh [title] [list of datasets]`
-
-Where the title specifies the directory name to save data/outputs under and the list of datasets refers to the list of GEO Series (GSExxx) datasets you wish to combine.
 
 ### Outputs
 
