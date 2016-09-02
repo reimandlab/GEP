@@ -55,14 +55,63 @@ The **get_data.sh** script is the interface designed to let you download a list 
   * **get_data.log** tells the user whether a dataset was downloaded or not, depending whether it could find the dataset's raw data **.tar** file online
   * **get_data.err** shows the progress of each dataset being downloaded, and also if the program unexpectedly stops it will tell you where it stopped and an error message.
 
-2. Within the **data/rawData** directory there should be directories named after the GSEXXX datasets you specified to download , within each directory is that dataset's raw data **.tar** file
+2. Within the **data/rawData/** directory there should be directories named after the GSEXXX datasets you specified to download , within each directory is that dataset's raw data **.tar** file
 
-### Running Pipeline
+### Computational Pipeline
+The **start_gep.sh** script is designed as the interface to funnel datasets through the computational pipeline. In parallel with the data retrieval script, this script also has two options.
 
+1. `./start_gep.sh -d GSE19317 GSE64415 GSE50006 ...` The **-d** option tells the script to use the default action of the pipeline. The default action of the pipeline is to process each GSEXXX dataset listed individually, and the process for each dataset is submitted as a distinct job to the cluster.
+  * **Preprocessing.** There are two preprocessing strategies employed in the pipeline following quality control (identifying outliers) in order to see how different strategies affect data points.
+   
+    1. Peform preprocessing of clean samples and outliers together.
+    
+    2. Perform preprocessing of clean samples and outliers separately.
 
-### Outputs
+2. `./start_gep.sh -c MYTITLE GSE19317 GSE64415 GSE50006 ...` The **-c** option tells the script to combine the listed GSEXXX datasets and process it as if it were one dataset. Only one job is submitted to the cluster for the combined dataset, named **MYTITLE**.
+  * **Preprocessing.** Similar to the above option, once again two strategies of preprocessing the data are employed. The difference here is that any dataset you're using with the **-c** option to combine and process must have already been processed by the pipeline individually.
+    
+    1. Perform preprocessing of clean samples and outliers, as identified by individual processing, together.
+    
+    2. Perform preprocessing of clean samples and outliers, as identified by individual processing, separately.
+     
+#### Expected Outputs
+1. **Raw Data.** Once a dataset has been funneled through the pipeline, and preprocessed, raw data is movedf from **data/rawData/** to the **data/preprocessedData/** directory. Usually, for each dataset there are three directories for it in **preprocessedData**.
 
-Outputs from running the pipeline are all dumped into the outputs directory - within it, for each dataset put through the pipeline, there is a directory named after the dataset which will contain all of that dataset's respective outputs. This includes the gene expression data when all of the samples in the dataset are preprocessed together, the gene expression data of just the clean samples preprocessed together, and gene expression data just for the outlier samples preprocessed together. Besides this gene expression data, a number of plots are genberate using both strategies where clean and outlier samples are preprecessed together and separately. The plots include Principal Component Anaysis (PCA), variance explained by each component, boxplot of values, heatmaps, and correlation matrices.
+  * **GSEXXX** - this diectory contains all of the dataset's sample files.
+  
+  * **GSEXXX-clean** - this directory just contains the dataset's clean sample files.
+ 
+  * **GSEXXX-outliers** - this directory just contains the dataset's outlier sample files.
+    * This directory is not created if there are no outlier samples. 
+ 
+  * When the **-c** option is used, and a title is used, the files that end up in **preprocessedData** are named **MYTITLE**, **MYTITLE-clean**, and **MYTITLE-outliers**.
+
+2. **Gene Expression Data saved as R objects.** The gene expression data generated as a consequence of the different preprocessing strategies, are saved in the **output/GSEXXX/** directory where GSEXXX is the dataset's name.
+
+  * The gene expression data, when preprocessed altogether, is saved as **GSEXXX_gexprs_df.rsav**
+  
+  * The gene expression data, where just the clean samples have been preprocessed, is saved as **GSEXXX-clean_gexprs_df.rsav**
+  
+  * The gene expression data, where just the outlier samples have been processed, is saved as **GSEXXX-outliers_gexprs_df.rsav**
+  
+  *  If there are **less than two** outlier samples, then no separate preprocessing is performed - i.e., only a **GSEXXX_gexprs_df.rsav** is generated, since more than one sample is required for preprocessing to occur.
+  
+  * When the **-c** option isused the title is used, the gene expression data files are named **MYTITLE_gexprs_df.rsav**, **MYTITLE-clean_gexprs_df.rsav**, and **MYTITLE-outlier_gexprs_df.rsav** in a directory **output/MYTITLE/**.
+
+3. **Data Visualizations.** There are five plots generated and placed in each dataset's respective **output/GSEXXX/** directory, for each of the two preprocessing strategies. That makes 10 plots in all, when there are two or more outlier samples. The plots include
+
+  * **Principal Component Analysis (PCA).** These files will be titled **pca-GSEXXX-together.png** and **pca-GSEXXX-separate.png**.
+  
+  * **Variance Explained.** These files will be titled **variance-explained-GSEXXX-together.png** and **variance-explained-GSEXXX-separate.png**.
+  
+  * **Heatmap.** These files will be titled **heatmap-GSEXXX-together.png** and **heatmap-GSEXXX-separate.png**.
+  
+  * **Correlation Matrix.** These files will be titled **correlation-GSEXXX-together.png** and **correlation-GSEXXX-separate.png**.
+  
+  * **Boxplot of Values.** Thesefiles will be titled **boxplot-GSEXXX-together.png** and **boxplot-GSEXXX-separate.png** 
+  
+  * As stated before, when the **-c** option is used, the **GSEXXX** in the file titles will be replaced by **MYTITLE** specified in the command
 
 ### Shiny App
 
+**_This is a very preliminary front end for the pipeline and is not even connected to it as of yet. You can host it locally by going into the `gep-app/` directory and typing `Rscript app.R`._**
