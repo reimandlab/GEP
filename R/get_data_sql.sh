@@ -5,4 +5,4 @@
 source /oicr/cluster/etc/profile
 module load R/3.3.0
 
-Rscript --verbose /.mounts/labs/reimandlab/private/users/nsiddiqui/GEP/R/main_naccess.R "$@" 
+Rscript --verbose /.mounts/labs/reimandlab/private/users/nsiddiqui/GEP/R/get_data_sql.R "$@" 

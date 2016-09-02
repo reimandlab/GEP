@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -l h_vmem=35g
+#$ -l h_vmem=30g
 #$ -cwd
 
 source /oicr/cluster/etc/profile

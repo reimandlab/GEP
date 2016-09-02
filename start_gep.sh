@@ -6,12 +6,13 @@
 # (combine option)
 
 usage() {
+    echo "GEP - Gene Expression Pipeline"
+    echo "usage: $0 [options]"
+    echo "                [-d gse_list]            default, submits each dataset listed to be processed as an individual job"
+    echo "                [-c title gse_list]      combine datasets listed and process the combined dataset, named title"
     echo ""
-    echo "Usage: $0 [-d list_of_datasets] or [-c list_of_datasets]"
-    echo ""
-    echo ""
-    echo "    -d : default, submits each dataset to be processed as an individual job"
-    echo "    -c : combine datasets and process combined dataset"
+    echo "gse_list          GSEXXX ..."
+    echo "title             TITLE"
     echo ""
     exit 1
 }

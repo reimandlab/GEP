@@ -20,6 +20,7 @@ if ( length( args ) == 0 ) {
 }
 
 setwd( "data" )
+getSQLiteFile()
 con <- dbConnect( SQLite(), 'GEOmetadb.sqlite' )
 
 query_ret <- dbGetQuery( con, query )

@@ -2,7 +2,7 @@ library(shiny)
 library(shinythemes)
 source("geodb_utils.R")
 
-if (!file.exists('GEOmetadb.sqlite')) getSQLiteFile()
+#getSQLiteFile()
 con <- dbConnect(SQLite(), "GEOmetadb.sqlite")
 
 server <- function(input, output, session){

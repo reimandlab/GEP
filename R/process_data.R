@@ -1,10 +1,13 @@
 library( tools )
+library( affy )
 source( "R/preprocess.R" )
 source( "R/plots.R" )
 
 # creates different directories to store clean and outlier samples in
 # aroma preprocessing requires this to preprocess them separately
 separate.outliers <- function( dataset, outliers, clean, cdf) {
+
+    # copying outliers to a separate directory 
     print("Moving outlier samples to an 'outlier' directory." )
         if ( ! length( outliers ) == 0 ) {
             dir.name <- paste( dataset, "outliers", sep = "-" )
@@ -15,6 +18,8 @@ separate.outliers <- function( dataset, outliers, clean, cdf) {
             abs.path <- normalizePath( rel.path )
             file.copy( outliers, abs.path )
         }
+
+    # copying clean sample to a separate directory
         if ( ! length( clean ) == 0 ) {
             dir.name <- paste( dataset, "clean", sep = "-" )
             rel.path <- file.path("..", "..", dir.name )
@@ -33,15 +38,16 @@ move.preprocessed.data <- function( dataset ) {
     unlink( file.path( "rawData", dataset ), recursive = TRUE )
 }
 
-process.data <- function( dataset, cdf, outliers.files ) {
+process.data <- function( dataset, cdf, outlier.files ) {
 
     # go to data directory, which must be the working directory to execute
     # preprocessing with aroma on dataset
     setwd( "../../.." )
 
     # create output directory named after dataset being currently processed
-    out.dir <- normalizePath( file.path("..", "output", dataset) )
-    if( !dir.exists( out.dir ) ) dir.create( output.dir )
+    out.dir <- normalizePath( file.path( "..", "output" ) )
+    out.dir <- file.path( out.dir, dataset )
+    if( !dir.exists( out.dir ) ) dir.create( out.dir )
     outliers <- sapply( outlier.files, FUN = file_path_sans_ext,
                         USE.NAMES = FALSE )
 
@@ -98,7 +104,7 @@ process.data <- function( dataset, cdf, outliers.files ) {
     preprocessed.clean.data <- preprocess( paste( dataset, "clean", sep = "-" ),
                                            cdf, out.dir )
     preprocessed.outlier.data <- preprocess( paste( dataset, "outliers", sep = "-"),
-                                             cdf out.dir )
+                                             cdf, out.dir )
     
     # generate PCA plot of the above preprocessed data
     pca.separate( preprocessed.clean.data, preprocessed.outlier.data, dataset, out.dir )
