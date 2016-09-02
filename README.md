@@ -114,4 +114,6 @@ The **start_gep.sh** script is designed as the interface to funnel datasets thro
 
 ### Shiny App
 
-**_This is a very preliminary front end for the pipeline and is not even connected to it as of yet. You can host it locally by going into the `gep-app/` directory and typing `Rscript app.R`._**
+**_This is a very preliminary front end for the pipeline and is not even connected to it as of yet._** 
+
+You can host it locally by going into the `gep-app/` directory and typing `Rscript app.R`. The app uses an SQLite database to grab metadata about GSE datasets. This is extremely slow and painful. SQLite database should be migrated to MySQL or something faster for practical use of this app.
